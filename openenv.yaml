@@ -26,6 +26,12 @@ tasks:
       with clear signals. Tests basic email understanding and priority reasoning.
     max_steps: 10
     score_range: [0.0, 1.0]
+    grader:
+      type: programmatic
+      method: environment
+      description: >
+        Scores based on priority label accuracy. Each email contributes equally.
+        Perfect priority match: 0.2 points. Partial credit for close matches.
 
   - name: medium_triage
     difficulty: medium
@@ -35,6 +41,12 @@ tasks:
       action selection under ambiguity.
     max_steps: 16
     score_range: [0.0, 1.0]
+    grader:
+      type: programmatic
+      method: environment
+      description: >
+        Scores based on priority accuracy (60%) and action correctness (40%).
+        Weighted average across all processed emails.
 
   - name: hard_triage
     difficulty: hard
@@ -44,6 +56,12 @@ tasks:
       email handling including natural language generation quality.
     max_steps: 30
     score_range: [0.0, 1.0]
+    grader:
+      type: programmatic
+      method: environment
+      description: >
+        Comprehensive grading: priority (35%), action (35%), reply quality (30%).
+        Reply quality assessed via keyword matching and professional tone indicators.
 
 action_space:
   type: EmailAction
