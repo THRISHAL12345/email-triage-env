@@ -28,6 +28,7 @@ from openai.types.chat import ChatCompletionMessageParam
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME", "email-triage-env")
+ENV_URL          = os.getenv("ENV_URL")  # Remote HF Space URL (optional)
 API_KEY          = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 API_BASE_URL     = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME       = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
@@ -218,10 +219,14 @@ async def run_task(task_name: str) -> None:
 
     log_start(task=task_name, env=BENCHMARK, model=MODEL_NAME)
 
-    env = await EmailTriageEnv.from_docker_image(
-        LOCAL_IMAGE_NAME,
-        env_vars={"EMAIL_TRIAGE_TASK": task_name},
-    )
+    # Connect to remote URL if provided, otherwise use local Docker image
+    if ENV_URL:
+        env = EmailTriageEnv(ENV_URL)
+    else:
+        env = await EmailTriageEnv.from_docker_image(
+            LOCAL_IMAGE_NAME,
+            env_vars={"EMAIL_TRIAGE_TASK": task_name},
+        )
 
     try:
         result   = await env.reset(task_name=task_name)
