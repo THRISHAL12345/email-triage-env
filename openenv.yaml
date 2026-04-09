@@ -1,0 +1,138 @@
+name: email-triage-env
+description: >
+  Email inbox triage environment for training and evaluating AI agents on
+  real-world email management tasks. Agents must classify email priority,
+  choose the correct action (reply/archive/delete/escalate), and draft
+  professional replies. Three tasks of increasing difficulty provide a
+  rich training curriculum from simple classification to full triage with
+  natural language generation.
+version: "1.0.0"
+author: openenv-community
+tags:
+  - openenv
+  - email
+  - triage
+  - nlp
+  - classification
+  - real-world
+  - rl
+  - agent
+
+tasks:
+  - name: easy_triage
+    difficulty: easy
+    description: >
+      Assign correct priority labels (urgent/high/medium/low) to 5 emails
+      with clear signals. Tests basic email understanding and priority reasoning.
+    max_steps: 10
+    score_range: [0.0, 1.0]
+
+  - name: medium_triage
+    difficulty: medium
+    description: >
+      Label priority AND choose the correct action (reply/archive/delete/escalate)
+      for 8 emails with mixed signals. Tests multi-label classification and
+      action selection under ambiguity.
+    max_steps: 16
+    score_range: [0.0, 1.0]
+
+  - name: hard_triage
+    difficulty: hard
+    description: >
+      Full triage of 12 emails: assign priority, choose action, AND draft a
+      relevant professional reply for all emails requiring one. Tests end-to-end
+      email handling including natural language generation quality.
+    max_steps: 30
+    score_range: [0.0, 1.0]
+
+action_space:
+  type: EmailAction
+  description: >
+    One triage action targeting a specific email by ID.
+  fields:
+    email_id:
+      type: string
+      description: ID of the email being acted on (e.g. 'e001')
+      required: true
+    action_type:
+      type: string
+      enum: [label, reply, archive, delete, escalate, skip]
+      description: >
+        label: assign a priority level
+        reply: compose and send a reply (requires reply_body)
+        archive: file for later, no response needed
+        delete: remove from inbox (spam, irrelevant)
+        escalate: flag as needing immediate human attention
+        skip: pass on this email (penalized)
+      required: true
+    priority:
+      type: string
+      enum: [urgent, high, medium, low]
+      description: Priority level — required when action_type is 'label'
+      required: false
+    reply_body:
+      type: string
+      description: Full reply text — required when action_type is 'reply'
+      required: false
+
+observation_space:
+  type: EmailObservation
+  description: >
+    Current environment state returned after reset() or step().
+  fields:
+    current_email:
+      type: object
+      description: The next email to process (null when inbox is empty)
+      fields:
+        id: string
+        from: string
+        to: string
+        subject: string
+        body: string
+        timestamp: string (ISO 8601)
+        has_attachment: boolean
+        labels: list[string]
+    inbox_summary:
+      type: object
+      fields:
+        total: integer
+        processed: integer
+        pending: integer
+        current_index: integer
+    last_action_result:
+      type: string
+      description: Human-readable description of last action outcome
+    last_action_error:
+      type: string|null
+      description: Error message if last action was invalid, else null
+    task_name: string
+    task_description: string
+    step_count: integer
+    max_steps: integer
+    score_so_far:
+      type: float
+      range: [0.0, 1.0]
+      description: Running episode score updated after each step
+    done: boolean
+    reward:
+      type: float
+      description: Per-step dense reward signal
+
+reward:
+  type: dense
+  description: >
+    Per-step reward based on correctness of priority label, action choice,
+    and reply quality. Weighted by task configuration.
+    Final score is a weighted average across all emails processed.
+  range: [-0.1, 0.4]
+  components:
+    priority_accuracy: weight varies by task (0.35–1.0)
+    action_accuracy: weight varies by task (0–0.5)
+    reply_quality: weight varies by task (0–0.30)
+    invalid_action_penalty: -0.05 to -0.1
+
+server:
+  port: 7860
+  health_endpoint: /health
+  reset_endpoint: /reset
+  concurrent_sessions: 8

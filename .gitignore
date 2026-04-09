@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+*.pyo
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Lock files (keep uv.lock for reproducibility)
+# pip-compile artifacts
+*.lock.bak
+
+# OS
+Thumbs.db
+.DS_Store
+
+# HF Space clone (don't duplicate in GitHub)
+email-triage-env/
+
+# Build artifacts
+*.whl
+*.tar.gz
