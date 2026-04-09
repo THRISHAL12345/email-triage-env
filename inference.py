@@ -27,7 +27,7 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-IMAGE_NAME: str  = os.getenv("IMAGE_NAME", "email-triage-env")
+LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME", "email-triage-env")
 API_KEY          = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 API_BASE_URL     = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME       = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
@@ -219,7 +219,7 @@ async def run_task(task_name: str) -> None:
     log_start(task=task_name, env=BENCHMARK, model=MODEL_NAME)
 
     env = await EmailTriageEnv.from_docker_image(
-        IMAGE_NAME,
+        LOCAL_IMAGE_NAME,
         env_vars={"EMAIL_TRIAGE_TASK": task_name},
     )
 
