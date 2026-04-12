@@ -432,6 +432,8 @@ class EmailTriageEnvironment(Environment[EmailAction, EmailObservation, EmailSta
             self._results[action.email_id]["priority"] = action.priority
         elif action.action_type != "skip":
             self._results[action.email_id]["action"] = action.action_type
+            if action.priority:
+                self._results[action.email_id]["priority"] = action.priority
             if action.reply_body:
                 self._results[action.email_id]["reply_body"] = action.reply_body
 

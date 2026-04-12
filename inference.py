@@ -23,6 +23,12 @@ import os
 import textwrap
 from typing import Any, Dict, List, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam
 
