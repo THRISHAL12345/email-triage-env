@@ -494,6 +494,15 @@ class EmailTriageEnvironment(Environment[EmailAction, EmailObservation, EmailSta
                 if has_action:
                     self._current_index += 1
 
+    def grade(self) -> float:
+        """
+        Grade the current episode and return a score in [0.0, 1.0].
+        
+        This method is called by the OpenEnv framework to compute the final
+        score for an episode based on the agent's performance.
+        """
+        return _grade_episode(self._task_cfg, self._emails, self._results)
+
     @property
     def state(self) -> EmailState:
         return EmailState(
