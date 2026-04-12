@@ -32,7 +32,7 @@ server = "server.app:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["server*", "models", "client"]
+include = ["server*", "models", "client", "tasks*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
